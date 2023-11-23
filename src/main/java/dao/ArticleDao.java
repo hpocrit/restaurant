@@ -125,4 +125,18 @@ public class ArticleDao implements Dao<Article>{
         statement.setInt(7, article.getViews());
         statement.setInt(8, article.getLikes());
     }
+    public int findArticleId(String content) {
+        String sql = "SELECT * FROM articles WHERE summary = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, content);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("article_id");
+            } else {
+                return -1;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -32,7 +32,7 @@ footer span a { color: #FFF; }
 }
 
 .tm-container {
-    max-width: 1200px;
+    max-width: 900px;
 }
 
 .parallax-window {
@@ -77,7 +77,7 @@ a.tm-bg-green:hover {
 }
 
 .tm-item-container {
-    max-width: 520px;
+    max-width: 4096px;
 }
 
 .input:focus {

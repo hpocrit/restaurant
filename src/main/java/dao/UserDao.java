@@ -127,7 +127,7 @@ public class UserDao implements Dao<User>{
                 "last_name = ?, " +
                 "country = ?, " +
                 "city = ?, " +
-                "is_male = ? " +
+                "female = ?, " +
                 "date_of_birth = ?;";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());

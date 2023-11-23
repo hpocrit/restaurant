@@ -42,6 +42,7 @@ public class ProfileServlet extends HttpServlet {
         updateUserMainInfo(req);
         updatePassword(req);
         updateProfilePicture(req, resp);
+        resp.sendRedirect(req.getContextPath() + "/profile");
     }
 
     private void updateUserMainInfo(HttpServletRequest req) {
@@ -51,10 +52,10 @@ public class ProfileServlet extends HttpServlet {
             return;
         }
 
-        String mail = req.getParameter("email");
-        String firstName = req.getParameter("firstName");
-        String lastName = req.getParameter("lastName");
-        Date dateOfBirth = Date.valueOf(req.getParameter("dateOfBirth"));
+        String mail = req.getParameter("mail");
+        String firstName = req.getParameter("first_name");
+        String lastName = req.getParameter("last_name");
+        Date dateOfBirth = Date.valueOf(req.getParameter("date_of_birth"));
         String gender = req.getParameter("gender");
         String country = req.getParameter("country");
         String city = req.getParameter("city");
