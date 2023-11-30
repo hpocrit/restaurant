@@ -17,6 +17,8 @@ public class CommentService implements Service<Comment, CommentDto> {
 
     private int currentUserId;
 
+    public CommentService() {}
+
     public CommentService(int currentUserId) {
         this.currentUserId = currentUserId;
     }

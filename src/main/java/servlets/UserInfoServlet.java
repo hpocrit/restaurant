@@ -1,6 +1,6 @@
 package servlets;
 
-import dao.FriendDaoImpl;
+import dao.FriendDao;
 import dto.UserDto;
 import entities.Friend;
 import service.UserService;
@@ -16,7 +16,7 @@ import static servlets.MenuServlet.findUserIdInCookie;
 
 @WebServlet(name = "userInfoServlet", urlPatterns = "/user")
 public class UserInfoServlet extends HttpServlet {
-    FriendDaoImpl friendDao;
+    FriendDao friendDao;
     int currUserId, friendId;
 
     Friend friend;
@@ -25,11 +25,11 @@ public class UserInfoServlet extends HttpServlet {
         currUserId = findUserIdInCookie(req);
         friendId = Integer.parseInt(req.getParameter("userId"));
         if (currUserId == friendId) {
-            resp.sendRedirect("/profile");
+            resp.sendRedirect(req.getContextPath() + "/profile");
             return;
         }
 
-        friendDao = new FriendDaoImpl();
+        friendDao = new FriendDao();
 
         friend = new Friend(currUserId, friendId);
 

@@ -15,7 +15,7 @@
                     very helpful. Another way is to tell your friends about Tooplate website. Thank you.
                 </p>
             </div>
-            <a href="http://localhost:8080/restaurant_war/login" class="inline-block tm-bg-green transition text-white text-xl pt-3 pb-4 px-8 rounded-md">
+            <a href="login" class="inline-block tm-bg-green transition text-white text-xl pt-3 pb-4 px-8 rounded-md">
                 <i class="far fa-comments mr-4"></i>
                 Login
             </a>

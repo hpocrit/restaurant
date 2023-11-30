@@ -18,7 +18,7 @@
                 </div>
                 <div class="text-center">
                     <div class="inline-block">
-                        <a href="http://localhost:8080/restaurant_war/menu" class="flex justify-center items-center bg-black bg-opacity-70 py-6 px-8 rounded-lg font-semibold tm-text-2xl tm-text-gold hover:text-gray-200 transition">
+                        <a href="menu" class="flex justify-center items-center bg-black bg-opacity-70 py-6 px-8 rounded-lg font-semibold tm-text-2xl tm-text-gold hover:text-gray-200 transition">
                             <i class="fas fa-coffee mr-3"></i>
                             <span>Let's explore...</span>
                         </a>

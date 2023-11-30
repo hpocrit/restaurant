@@ -19,8 +19,8 @@ public class RegistrationServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig config) throws ServletException {
-        ServletContext servletContext = config.getServletContext();
-        userService = (UserService) servletContext.getAttribute("userService");
+        super.init(config);
+        userService = (UserService) config.getServletContext().getAttribute("userService");
     }
 
     @Override

@@ -18,8 +18,12 @@
                         <div class="text-right">
                             <button type="submit" class="text-white hover:text-yellow-500 transition">Log In</button>
                         </div>
+
                     </form>
                 </div>
+            </div>
+            <div class="text-center">
+                <a rel="nofollow" href="registration" target="_parent">registration</a>
             </div>
         </div>
     </div>

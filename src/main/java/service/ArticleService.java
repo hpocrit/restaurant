@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 public class ArticleService implements Service<Article, ArticleDto>{
     private final ArticleDao articleDao = new ArticleDao();
-    private final UserDao userDao = new UserDao();
     @Override
     public List<ArticleDto> getAll() {
         return articleDao.getAll().stream().map(

@@ -14,7 +14,9 @@ import entities.CommentLike;
 import org.cloudinary.json.JSONObject;
 import service.ArticleService;
 import service.CommentService;
+import service.UserService;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -35,11 +37,22 @@ public class ArticleServlet  extends HttpServlet {
     private CommentService commentService;
     private int articleId;
     private int userId;
+    private ArticleLikeDao articleLikeDao;
+    private CommentDao commentDao;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        articleDao = (ArticleDao) config.getServletContext().getAttribute("articleDao");
+        commentService = (CommentService) config.getServletContext().getAttribute("commentService");
+        articleLikeDao = (ArticleLikeDao) config.getServletContext().getAttribute("articleLikeDao");
+        commentDao = (CommentDao) config.getServletContext().getAttribute("commentDao");
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String title = req.getParameter("title");
 
-        articleDao = new ArticleDao();
         commentService = new CommentService(userId);
         ArticleService service = new ArticleService();
 
@@ -52,8 +65,7 @@ public class ArticleServlet  extends HttpServlet {
         articleId = articleDao.findArticleId(currentArticle.getSummary());
         userId = findUserIdInCookie(req);
 
-        ArticleLikeDao likeDao = new ArticleLikeDao();
-        boolean isArticleLiked = likeDao.isArticleLiked(new ArticleLike(userId,articleId));
+        boolean isArticleLiked = articleLikeDao.isArticleLiked(new ArticleLike(userId,articleId));
 
         List<CommentDto> comments = commentService.getAllCommentsForArticle(articleId);
         comments.sort(Comparator.comparing(CommentDto::getSendingTime));
@@ -65,33 +77,35 @@ public class ArticleServlet  extends HttpServlet {
         req.getRequestDispatcher("ftl/article.ftl").forward(req, resp);
     }
 
+
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String action = req.getParameter("action");
 
-        if ("articleLike".equals(action)) {
-            sendArticleLike(resp);
-        } else if ("comment".equals(action)) {
-            sendComment(req, resp);
-        } else if ("commentLike".equals(action)) {
-            sendCommentLike(req, resp);
-        }
+        sendArticleLike(resp);
+
+        sendComment(req, resp);
+
+        sendCommentLike(req, resp);
+
+
+
+        resp.sendRedirect(req.getContextPath() + "/article?title=" + currentArticle.getTitle());
     }
 
 
     private void sendArticleLike(HttpServletResponse resp) throws IOException {
-        ArticleLikeDao likeDao = new ArticleLikeDao();
         ArticleLike like = new ArticleLike(userId, articleId);
 
-        boolean isArticleLiked = likeDao.isArticleLiked(like);
+        boolean isArticleLiked = articleLikeDao.isArticleLiked(like);
 
         if (isArticleLiked) {
-            likeDao.delete(like);
+            articleLikeDao.delete(like);
         } else {
-            likeDao.insert(like);
+            articleLikeDao.insert(like);
         }
 
-        int count = likeDao.getLikesCount(articleId);
+        int count = articleLikeDao.getLikesCount(articleId);
         currentArticle.setLikes(count);
         articleDao.update(currentArticle);
 
@@ -99,69 +113,68 @@ public class ArticleServlet  extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
 
         // Создайте объект JSON для отправки
-        JSONObject responseJSON = new JSONObject();
-        responseJSON.put("likesCount", count);
-        responseJSON.put("isArticleLiked", !isArticleLiked);
-
-        resp.getWriter().print(responseJSON);
+//        JSONObject responseJSON = new JSONObject();
+//        responseJSON.put("likesCount", count);
+//        responseJSON.put("isArticleLiked", !isArticleLiked);
+//
+//        resp.getWriter().print(responseJSON);
 
     }
 
     private void sendComment(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String commentText = req.getParameter("comment");
+        if(commentText != null) {
+            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
 
-        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+            Comment comment = new Comment(commentText, currentTime, userId, articleId);
+            commentService.insert(comment);
 
-        Comment comment = new Comment(commentText, currentTime, userId, articleId);
-        commentService.insert(comment);
+            int commentId = commentDao.findCommentId(commentText, currentTime);
 
-        CommentDao commentDao = new CommentDao();
 
-        int commentId = commentDao.findCommentId(commentText, currentTime);
-
-        CommentDto commentDto = commentService.getById(commentId);
-
-        Gson gson = new Gson();
-        String jsonResponse = gson.toJson(commentDto);
-
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-
-        PrintWriter out = resp.getWriter();
-        out.print(jsonResponse);
-        out.close();
+//            Gson gson = new Gson();
+//            String jsonResponse = gson.toJson(commentDto);
+//
+//            resp.setContentType("application/json");
+//            resp.setCharacterEncoding("UTF-8");
+//
+//            PrintWriter out = resp.getWriter();
+//            out.print(jsonResponse);
+//            out.close();
+        }
     }
 
 
 
     private void sendCommentLike(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        int commentId = Integer.parseInt(req.getParameter("commentId"));
+        String a = req.getParameter("commentId");
+        if(a != null) {
+            int commentId = Integer.parseInt(a);
+            CommentLikeDao likeDao = new CommentLikeDao();
+            CommentLike like = new CommentLike(userId, commentId);
+            Comment comment = commentDao.getById(commentId);
 
-        CommentLikeDao likeDao = new CommentLikeDao();
-        CommentDao commentDao = new CommentDao();
-        CommentLike like = new CommentLike(userId, commentId);
-        Comment comment = commentDao.getById(commentId);
+            boolean isCommentLiked = likeDao.isCommentLiked(like);
 
-        boolean isCommentLiked = likeDao.isCommentLiked(like);
+            if (isCommentLiked) {
+                likeDao.delete(like);
+            } else {
+                likeDao.insert(like);
+            }
 
-        if (isCommentLiked) {
-            likeDao.delete(like);
-        } else {
-            likeDao.insert(like);
+            int count = likeDao.getLikesCount(commentId);
+            comment.setLikes(count);
+            commentDao.update(comment);
+
+//            resp.setContentType("application/json");
+//            resp.setCharacterEncoding("UTF-8");
+//
+//            // Создайте объект JSON для отправки
+//            JSONObject responseJSON = new JSONObject();
+//            responseJSON.put("likesCount", count);
+//            responseJSON.put("isCommentLiked", !isCommentLiked);
+//
+//            resp.getWriter().print(responseJSON);
         }
-
-        int count = likeDao.getLikesCount(commentId);
-        comment.setLikes(count);
-        commentDao.update(comment);
-
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-
-        // Создайте объект JSON для отправки
-        JSONObject responseJSON = new JSONObject();
-        responseJSON.put("likesCount", count);
-        responseJSON.put("isCommentLiked", !isCommentLiked);
-
-        resp.getWriter().print(responseJSON);
     }
 }

@@ -41,7 +41,7 @@ public class ProfileServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         updateUserMainInfo(req);
         updatePassword(req);
-        updateProfilePicture(req, resp);
+//        updateProfilePicture(req, resp);
         resp.sendRedirect(req.getContextPath() + "/profile");
     }
 
@@ -88,36 +88,36 @@ public class ProfileServlet extends HttpServlet {
         service.update(user);
     }
 
-    private void updateProfilePicture(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-        try {
-            Part profilePicture = req.getPart("profilePicture");
-            String filename = Paths.get(profilePicture.getSubmittedFileName()).getFileName().toString();
-
-            File file = File.createTempFile(FILE_NAME_PREFIX + File.separator + (filename.hashCode() % DIRECTORIES_COUNT) + File.separator + filename, "");
-
-            InputStream content = profilePicture.getInputStream();
-            file.getParentFile().mkdirs();
-            file.createNewFile();
-            FileOutputStream out = new FileOutputStream(file);
-            byte[] buffer = new byte[content.available()];
-            content.read(buffer);
-            out.write(buffer);
-            file.deleteOnExit();
-            out.close();
-
-            String profilePictureUrl = cloudinary.uploader().upload(file, new HashMap<>()).get("secure_url").toString();
-
-            User user = new User(userId);
-            user.setProfilePicture(profilePictureUrl);
-            UserService service = new UserService();
-            service.update(user);
-
-            resp.setContentType("text/plain");
-            resp.getWriter().write(profilePictureUrl);
-        } catch (Exception ignored) {
-
-        }
-    }
+//    private void updateProfilePicture(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+//        try {
+//            Part profilePicture = req.getPart("profilePicture");
+//            String filename = Paths.get(profilePicture.getSubmittedFileName()).getFileName().toString();
+//
+//            File file = File.createTempFile(FILE_NAME_PREFIX + File.separator + (filename.hashCode() % DIRECTORIES_COUNT) + File.separator + filename, "");
+//
+//            InputStream content = profilePicture.getInputStream();
+//            file.getParentFile().mkdirs();
+//            file.createNewFile();
+//            FileOutputStream out = new FileOutputStream(file);
+//            byte[] buffer = new byte[content.available()];
+//            content.read(buffer);
+//            out.write(buffer);
+//            file.deleteOnExit();
+//            out.close();
+//
+//            String profilePictureUrl = cloudinary.uploader().upload(file, new HashMap<>()).get("secure_url").toString();
+//
+//            User user = new User(userId);
+//            user.setProfilePicture(profilePictureUrl);
+//            UserService service = new UserService();
+//            service.update(user);
+//
+//            resp.setContentType("text/plain");
+//            resp.getWriter().write(profilePictureUrl);
+//        } catch (Exception ignored) {
+//
+//        }
+//    }
 
     private void findUserIdInCookie(HttpServletRequest req) {
         Cookie[] cookies = req.getCookies();

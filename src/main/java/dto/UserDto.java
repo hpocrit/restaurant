@@ -16,6 +16,16 @@ public class UserDto {
     private String lastName;
     private String country;
     private String city;
+    private int age;
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
     private String profilePicture;
     private boolean female;
     private Date dateOfBirth;
@@ -120,6 +130,7 @@ public class UserDto {
         this.profilePicture = user.getProfilePicture();
         this.female = user.isFemale();
         this.dateOfBirth = user.getDateOfBirth();
+        this.age = calculateAge(user.getDateOfBirth());
     }
     private int calculateAge(java.util.Date dateOfBirth) {
         java.util.Date utilDate = new java.util.Date(dateOfBirth.getTime());

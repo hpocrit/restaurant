@@ -12,7 +12,7 @@ import java.util.List;
 import static connection.DatabaseConnection.getConnection;
 
 
-public class FriendDaoImpl implements Dao<Friend> {
+public class FriendDao implements Dao<Friend> {
     private Connection connection = getConnection();
 
     @Override
