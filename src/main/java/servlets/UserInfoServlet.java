@@ -3,8 +3,10 @@ package servlets;
 import dao.FriendDao;
 import dto.UserDto;
 import entities.Friend;
+import entities.User;
 import service.UserService;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -18,8 +20,16 @@ import static servlets.MenuServlet.findUserIdInCookie;
 public class UserInfoServlet extends HttpServlet {
     FriendDao friendDao;
     int currUserId, friendId;
-
     Friend friend;
+    private UserService userService;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        friendDao = (FriendDao) config.getServletContext().getAttribute("friendDao");
+        userService = (UserService) config.getServletContext().getAttribute("userService");
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         currUserId = findUserIdInCookie(req);
@@ -29,11 +39,10 @@ public class UserInfoServlet extends HttpServlet {
             return;
         }
 
-        friendDao = new FriendDao();
 
         friend = new Friend(currUserId, friendId);
 
-        UserDto userDto = new UserService().getById(friendId);
+        UserDto userDto = userService.getById(friendId);
         boolean isFriendAdded = friendDao.isFriendAdded(friend);
 
         req.setAttribute("user", userDto);
@@ -52,8 +61,10 @@ public class UserInfoServlet extends HttpServlet {
             friendDao.insert(friend);
         }
 
-        resp.setContentType("text/plain");
-        resp.setCharacterEncoding("UTF-8");
-        resp.getWriter().write(String.valueOf(!isFriendAdded));
+//        resp.setContentType("text/plain");
+//        resp.setCharacterEncoding("UTF-8");
+//        resp.getWriter().write(String.valueOf(!isFriendAdded));
+
+        resp.sendRedirect(req.getContextPath() + "/user?userId=" + friendId);
     }
 }

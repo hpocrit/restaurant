@@ -5,6 +5,7 @@ import dao.UserDao;
 import entities.User;
 import service.UserService;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -24,6 +25,15 @@ public class ProfileServlet extends HttpServlet {
     private static final int DIRECTORIES_COUNT = 100;
     private static final String FILE_NAME_PREFIX = "/tmp";
     private final Cloudinary cloudinary = getCloudinary();
+    private UserDao userDao;
+    private UserService userService;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        userDao = (UserDao) config.getServletContext().getAttribute("userDao");
+        userService = (UserService) config.getServletContext().getAttribute("userService");
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -31,7 +41,7 @@ public class ProfileServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         findUserIdInCookie(req);
 
-        User user = new UserDao().getById(userId);
+        User user = userDao.getById(userId);
         req.setAttribute("user", user);
 
         req.getRequestDispatcher("ftl/profile.ftl").forward(req, resp);
@@ -70,7 +80,7 @@ public class ProfileServlet extends HttpServlet {
         user.setCountry(country);
         user.setCity(city);
 
-        UserService service = new UserService();
+        UserService service = userService;
 
         service.update(user);
     }
@@ -84,40 +94,9 @@ public class ProfileServlet extends HttpServlet {
 
         User user = new User(userId);
         user.setPassword(password);
-        UserService service = new UserService();
+        UserService service = userService;
         service.update(user);
     }
-
-//    private void updateProfilePicture(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-//        try {
-//            Part profilePicture = req.getPart("profilePicture");
-//            String filename = Paths.get(profilePicture.getSubmittedFileName()).getFileName().toString();
-//
-//            File file = File.createTempFile(FILE_NAME_PREFIX + File.separator + (filename.hashCode() % DIRECTORIES_COUNT) + File.separator + filename, "");
-//
-//            InputStream content = profilePicture.getInputStream();
-//            file.getParentFile().mkdirs();
-//            file.createNewFile();
-//            FileOutputStream out = new FileOutputStream(file);
-//            byte[] buffer = new byte[content.available()];
-//            content.read(buffer);
-//            out.write(buffer);
-//            file.deleteOnExit();
-//            out.close();
-//
-//            String profilePictureUrl = cloudinary.uploader().upload(file, new HashMap<>()).get("secure_url").toString();
-//
-//            User user = new User(userId);
-//            user.setProfilePicture(profilePictureUrl);
-//            UserService service = new UserService();
-//            service.update(user);
-//
-//            resp.setContentType("text/plain");
-//            resp.getWriter().write(profilePictureUrl);
-//        } catch (Exception ignored) {
-//
-//        }
-//    }
 
     private void findUserIdInCookie(HttpServletRequest req) {
         Cookie[] cookies = req.getCookies();

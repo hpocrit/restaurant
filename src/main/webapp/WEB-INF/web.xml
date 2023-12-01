@@ -21,9 +21,9 @@
     </init-param>
   </servlet>
 
-  <error-page>
-    <location>/error</location>
-  </error-page>
+<!--  <error-page>-->
+<!--    <location>/error</location>-->
+<!--  </error-page>-->
 
   <servlet-mapping>
     <servlet-name>freemarker</servlet-name>

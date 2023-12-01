@@ -1,10 +1,12 @@
 package servlets;
 
-import dao.Dao;
-import dao.UserDao;
+import dao.*;
 import entities.User;
+import service.ArticleService;
+import service.CommentService;
 import utils.PasswordUtil;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -13,6 +15,14 @@ import java.util.List;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
+    private UserDao userDao;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        userDao = (UserDao) config.getServletContext().getAttribute("userDao");
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Cookie[] cookies = req.getCookies();
@@ -35,7 +45,7 @@ public class LoginServlet extends HttpServlet {
         String rememberMe = req.getParameter("remember_me");
 
         if (username != null & password != null) {
-            Dao<User> service = new UserDao();
+            Dao<User> service = userDao;
             List<User> users = service.getAll();
 
             boolean isFound = false;

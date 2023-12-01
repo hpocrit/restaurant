@@ -1,6 +1,10 @@
 package servlets;
 
+import dao.ArticleDao;
+import dao.ArticleLikeDao;
 import dto.ArticleDto;
+import entities.Article;
+import entities.ArticleLike;
 import service.ArticleService;
 
 import javax.servlet.ServletConfig;
@@ -13,24 +17,33 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/menu")
-public class MenuServlet extends HttpServlet {
+@WebServlet("/favorite")
+public class FavoriteServlet extends HttpServlet {
     private ArticleService articleService;
+    private ArticleLikeDao articleLikeDao;
+    private ArticleDao articleDao;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         articleService = (ArticleService) config.getServletContext().getAttribute("articleService");
+        articleLikeDao = (ArticleLikeDao) config.getServletContext().getAttribute("articleLikeDao");
+        articleDao = (ArticleDao) config.getServletContext().getAttribute("articleDao");
+        
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<ArticleDto> articlesDto = articleService.getAll();
-
+        List<ArticleLike> articlesLikes = articleLikeDao.getByUserId(findUserIdInCookie(req));   
+        List<Article> articlesDto = null;
+        for (ArticleLike art: articlesLikes) {
+            articlesDto.add(articleDao.getById(art.getArticleId()));
+        }
+        
 
         req.setAttribute("all_news", articlesDto);
 
-        req.getRequestDispatcher("ftl/menu.ftl").forward(req, resp);
+        req.getRequestDispatcher("ftl/favorite.ftl").forward(req, resp);
     }
 
     static int findUserIdInCookie(HttpServletRequest req) {

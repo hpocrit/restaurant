@@ -11,9 +11,17 @@
                 </div>
                 <div class="bg-black bg-opacity-70 p-10 mb-5">
                     <p class="text-white leading-8 text-sm font-light">
-                        This is a coffee shop template named Antique Cafe which is a parallax HTML5 template with a good responsiveness.
-                        Feel free to use this layout for your cafe.
-                        If you have any question, please <a rel="nofollow" href="https://www.tooplate.com/contact" target="_parent">send us a message</a>.
+                        Indulge in a delightful experience at Antique Cafe. <a rel="nofollow" href="https://youtu.be/BbeeuzU5Qc8?si=X2aQaq7oX0zWurHv" target="_parent">Immerse yourself</a> in a cozy ambiance, tantalize your taste buds, and savor every sip and bite. Our passionate chefs and baristas are here to create culinary masterpieces that will leave you craving for more.
+                    </p>
+                    <p class="text-white leading-8 text-sm font-light">
+                        Discover a menu crafted with love, featuring an array of exquisite dishes and beverages. From hearty breakfast options to gourmet sandwiches and tantalizing desserts, there's something to please every palate. Pair your meal with our expertly brewed artisanal coffees or choose from a selection of refreshing teas and handcrafted beverages.
+                    </p>
+                    <p class="text-white leading-8 text-sm font-light">
+                        Whether you're here for a quick catch-up with friends, a blissful solo retreat, or a business meeting, our vibrant café offers the perfect setting. Wi-Fi accessibility and comfortable seating make it an ideal spot for work, relaxation, or simply unwinding.
+                    </p>
+                    <p class="text-white leading-8 text-sm font-light">
+
+                        At Café Haven, we believe in providing exceptional service, ensuring that every visit exceeds your expectations. So sit back, sip, and savor.
                     </p>
                 </div>
                 <div class="text-center">

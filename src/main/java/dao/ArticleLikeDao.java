@@ -30,6 +30,21 @@ public class ArticleLikeDao implements Dao<ArticleLike> {
         }
     }
 
+    public List<ArticleLike> getByUserId(int id) {
+        List<ArticleLike> likes = new ArrayList<>();
+        String sql = "SELECT * FROM article_likes WHERE user_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                likes.add(resultSetToUserLike(resultSet));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return likes;
+    }
+
     private ArticleLike resultSetToUserLike(ResultSet resultSet) throws SQLException {
         return new ArticleLike(
                 resultSet.getInt("user_id"),

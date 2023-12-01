@@ -35,10 +35,12 @@ public class ArticleServlet  extends HttpServlet {
     private ArticleDao articleDao;
     private Article currentArticle;
     private CommentService commentService;
+    private ArticleService articleService;
     private int articleId;
     private int userId;
     private ArticleLikeDao articleLikeDao;
     private CommentDao commentDao;
+    private CommentLikeDao commentLikeDao;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -47,19 +49,24 @@ public class ArticleServlet  extends HttpServlet {
         commentService = (CommentService) config.getServletContext().getAttribute("commentService");
         articleLikeDao = (ArticleLikeDao) config.getServletContext().getAttribute("articleLikeDao");
         commentDao = (CommentDao) config.getServletContext().getAttribute("commentDao");
+        commentLikeDao = (CommentLikeDao) config.getServletContext().getAttribute("commentLikeDao");
+        articleService = (ArticleService) config.getServletContext().getAttribute("articleService");
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String title = req.getParameter("title");
 
+        if (req.getParameter("error") != null && req.getParameter("error").equals("true")) {
+            req.setAttribute("errorMessage", "Empty Text");
+        }
+
         commentService = new CommentService(userId);
-        ArticleService service = new ArticleService();
 
         currentArticle = articleDao.getByTitle(title);
         currentArticle.setViews(currentArticle.getViews() + 1);
         articleDao.update(currentArticle);
-        ArticleDto articleDto = service.getById(currentArticle.getArticleId());
+        ArticleDto articleDto = articleService.getById(currentArticle.getArticleId());
 
 
         articleId = articleDao.findArticleId(currentArticle.getSummary());
@@ -84,13 +91,15 @@ public class ArticleServlet  extends HttpServlet {
 
         sendArticleLike(resp);
 
-        sendComment(req, resp);
+        boolean flag = sendComment(req, resp);
 
         sendCommentLike(req, resp);
+        if(!flag) {
+            resp.sendRedirect(req.getContextPath() + "/article?title=" + currentArticle.getTitle());
+        }
 
 
 
-        resp.sendRedirect(req.getContextPath() + "/article?title=" + currentArticle.getTitle());
     }
 
 
@@ -121,15 +130,17 @@ public class ArticleServlet  extends HttpServlet {
 
     }
 
-    private void sendComment(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private boolean sendComment(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String commentText = req.getParameter("comment");
-        if(commentText != null) {
+        boolean flag = false;
+        if(!commentText.isEmpty() ) {
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+
 
             Comment comment = new Comment(commentText, currentTime, userId, articleId);
             commentService.insert(comment);
 
-            int commentId = commentDao.findCommentId(commentText, currentTime);
+//            int commentId = commentDao.findCommentId(commentText, currentTime);
 
 
 //            Gson gson = new Gson();
@@ -141,7 +152,12 @@ public class ArticleServlet  extends HttpServlet {
 //            PrintWriter out = resp.getWriter();
 //            out.print(jsonResponse);
 //            out.close();
+        } else {
+            req.setAttribute("errorMessage", "Empty Text");
+            resp.sendRedirect(req.getContextPath() + "/article?error=true"  + "&title=" + currentArticle.getTitle());
+            flag = true;
         }
+        return flag;
     }
 
 
@@ -150,19 +166,18 @@ public class ArticleServlet  extends HttpServlet {
         String a = req.getParameter("commentId");
         if(a != null) {
             int commentId = Integer.parseInt(a);
-            CommentLikeDao likeDao = new CommentLikeDao();
             CommentLike like = new CommentLike(userId, commentId);
             Comment comment = commentDao.getById(commentId);
 
-            boolean isCommentLiked = likeDao.isCommentLiked(like);
+            boolean isCommentLiked = commentLikeDao.isCommentLiked(like);
 
             if (isCommentLiked) {
-                likeDao.delete(like);
+                commentLikeDao.delete(like);
             } else {
-                likeDao.insert(like);
+                commentLikeDao.insert(like);
             }
 
-            int count = likeDao.getLikesCount(commentId);
+            int count = commentLikeDao.getLikesCount(commentId);
             comment.setLikes(count);
             commentDao.update(comment);
 
